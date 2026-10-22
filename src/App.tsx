@@ -2,6 +2,7 @@ import { useLang } from './i18n';
 import { CaseFormPage } from './pages/CaseFormPage';
 import { CaseListPage } from './pages/CaseListPage';
 import { CASE_TABS, CaseViewPage, type CaseTab } from './pages/CaseViewPage';
+import { RulesPage } from './pages/RulesPage';
 import { href, useHashPath } from './router';
 
 function Page({ path }: { path: string[] }) {
@@ -15,6 +16,7 @@ function Page({ path }: { path: string[] }) {
     const tab = (CASE_TABS as readonly string[]).includes(sub ?? '') ? (sub as CaseTab) : 'overview';
     return <CaseViewPage caseId={id} tab={tab} />;
   }
+  if (section === 'rules') return <RulesPage />;
   return <p className="muted">{t('common.notFound')}</p>;
 }
 

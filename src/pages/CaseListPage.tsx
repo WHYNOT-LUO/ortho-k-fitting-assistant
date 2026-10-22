@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
 import { syntheticCases } from '../data/syntheticCases';
+import { EyeStatus } from '../components/FlagList';
+import { screenCase } from '../domain/screening';
 import { EYES } from '../domain/types';
 import { useLang } from '../i18n';
 import { href, navigate } from '../router';
@@ -81,7 +83,7 @@ export function CaseListPage() {
         </div>
       </div>
 
-      {error && <div className="notice level-check">{t('cases.storageError', { error })}</div>}
+      {error && <div className="notice level-stop">{t('cases.storageError', { error })}</div>}
       {message && <div className="notice level-info">{message}</div>}
 
       {sorted.length === 0 ? (
@@ -96,6 +98,7 @@ export function CaseListPage() {
                   <th>{t('cases.col.exam')}</th>
                   <th>{t('cases.col.age')}</th>
                   <th>{t('cases.col.eyes')}</th>
+                  <th>{t('cases.col.screening')}</th>
                   <th>{t('cases.col.visits')}</th>
                 </tr>
               </thead>
@@ -115,6 +118,13 @@ export function CaseListPage() {
                         <span key={e} className={`eye-tag ${e}`}>
                           {e}
                         </span>
+                      ))}
+                    </td>
+                    <td>
+                      {screenCase(c).eyes.map((r) => (
+                        <div key={r.eye} style={{ whiteSpace: 'nowrap' }}>
+                          <span className="mono small">{r.eye}</span> <EyeStatus level={r.overall} notChecked={r.notChecked.length} />
+                        </div>
                       ))}
                     </td>
                     <td>{c.visits.length}</td>

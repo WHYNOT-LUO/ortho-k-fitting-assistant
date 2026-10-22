@@ -16,8 +16,8 @@
   --info-soft: #e6eefb;
   --caution: #9a6200;
   --caution-soft: #fdf2dc;
-  --check: #b3261e;
-  --check-soft: #fbe5e3;
+  --stop: #b3261e;
+  --stop-soft: #fbe5e3;
 
   --radius: 10px;
   --shadow: 0 1px 2px rgba(16, 40, 56, 0.06), 0 1px 6px rgba(16, 40, 56, 0.04);
@@ -184,11 +184,11 @@ h3 {
   background: #0b5a73;
 }
 .btn-danger {
-  color: var(--check);
+  color: var(--stop);
   border-color: #efc2bd;
 }
 .btn-danger:hover {
-  background: var(--check-soft);
+  background: var(--stop-soft);
 }
 .btn-ghost {
   border-color: transparent;
@@ -272,6 +272,9 @@ h3 {
   .eyes {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+.eyes.single {
+  grid-template-columns: minmax(0, 1fr);
 }
 .eye-col {
   border: 1px solid var(--border);
@@ -489,9 +492,9 @@ tr.clickable:hover td {
   background: var(--caution-soft);
   color: var(--caution);
 }
-.level-check {
-  background: var(--check-soft);
-  color: var(--check);
+.level-stop {
+  background: var(--stop-soft);
+  color: var(--stop);
 }
 
 .flag {
@@ -512,8 +515,8 @@ tr.clickable:hover td {
 .flag.level-caution {
   border-color: var(--caution);
 }
-.flag.level-check {
-  border-color: var(--check);
+.flag.level-stop {
+  border-color: var(--stop);
 }
 .flag-body {
   flex: 1;
