@@ -493,6 +493,25 @@ export const zh = {
   'export.csvEyes': '导出 CSV（每眼一行）',
   'export.csvVisits': '导出 CSV（每次就诊一行）',
   'export.note': 'CSV 不含日期（改为距首次检查的天数）和自由文字备注，以保护隐私。',
+
+  // ---------------------------------------------------------------- Stretch: topography image check
+  'img.title': '地形图图片检查（实验功能）',
+  'img.intro': '上传戴镜后的切向/轴向曲率图，标出中心和比例尺，应用会统计中央 3 mm 内的红色像素（R12，阈值 I1）。未经验证，仅作提示，以验光师读图为准。',
+  'img.privacy': '上传前请裁掉图片上的姓名、出生日期等信息。图片只在本页面内处理，不会保存或上传。',
+  'img.choose': '选择图片',
+  'img.step1': '第 1 步：点击图上的角膜中心（地图中心）。',
+  'img.step2': '第 2 步：点击距中心已知距离的一个点（如刻度环或地图边缘），并填写该距离。',
+  'img.distance': '第 2 个点到中心的距离',
+  'img.reset': '重新标记',
+  'img.result': '中央 {zone} mm 内红色像素占 {pct}%（阈值 {threshold}%）。',
+  'img.flagged': '可能有问题：中央区出现红色，可能偏位、镜下气泡或干燥点（R12）。如确认，请在就诊记录中勾选。',
+  'img.clear': '中央区未检测到明显红色。',
+  'img.offset': '附近的红色主要集中在中心{dir}约 {mm} mm 处。',
+  'img.dir.left': '左侧',
+  'img.dir.right': '右侧',
+  'img.dir.up': '上方',
+  'img.dir.down': '下方',
+  'img.scale': '比例：{px} 像素/mm',
 } as const;
 
 export type MessageKey = keyof typeof zh;

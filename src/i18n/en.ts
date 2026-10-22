@@ -496,4 +496,23 @@ export const en: Record<MessageKey, string> = {
   'export.csvEyes': 'Export CSV (one row per eye)',
   'export.csvVisits': 'Export CSV (one row per visit)',
   'export.note': 'The CSV has no calendar dates (days since the first exam instead) and no free-text notes, to protect privacy.',
+
+  // ---------------------------------------------------------------- Stretch: topography image check
+  'img.title': 'Topography image check (experimental)',
+  'img.intro': "Upload a post-wear curvature map, mark its centre and scale, and the app counts red pixels inside the central 3 mm (R12, threshold I1). Not validated: a hint only; the optometrist's reading of the map comes first.",
+  'img.privacy': 'Crop out names, birth dates and other details before uploading. The image is processed on this page only and is never saved or uploaded.',
+  'img.choose': 'Choose image',
+  'img.step1': 'Step 1: click the centre of the map (corneal centre).',
+  'img.step2': 'Step 2: click a point a known distance from the centre (e.g. a scale ring or the map edge) and enter that distance.',
+  'img.distance': 'Distance of the 2nd point from the centre',
+  'img.reset': 'Mark again',
+  'img.result': 'Red pixels inside the central {zone} mm: {pct}% (threshold {threshold}%).',
+  'img.flagged': 'Possible problem: red inside the centre, possibly decentration, an air bubble or a dry spot (R12). If you agree, tick it in the visit record.',
+  'img.clear': 'No clear red detected in the centre.',
+  'img.offset': 'Nearby red is concentrated about {mm} mm {dir} of the centre.',
+  'img.dir.left': 'to the left',
+  'img.dir.right': 'to the right',
+  'img.dir.up': 'above',
+  'img.dir.down': 'below',
+  'img.scale': 'Scale: {px} px/mm',
 };

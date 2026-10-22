@@ -6,6 +6,7 @@ import { useLang, type MessageKey } from '../i18n';
 import { useCases } from '../storage/CasesContext';
 import { AxialChart } from './AxialChart';
 import { FlagItem } from './FlagList';
+import { TopoImageCheck } from './TopoImageCheck';
 import { VisitEditor } from './VisitEditor';
 
 function newVisitId(): string {
@@ -77,6 +78,8 @@ export function FollowUpPanel({ c }: { c: OrthoKCase }) {
           </table>
         </details>
       </section>
+
+      <TopoImageCheck />
 
       <div className="page-head" style={{ marginBottom: 8 }}>
         <h3 style={{ margin: 0 }}>{t('fu.visits')}</h3>
