@@ -1,3 +1,4 @@
+import { DesignPanel } from '../components/DesignPanel';
 import { ExamOverview } from '../components/ExamOverview';
 import { FollowUpPanel } from '../components/FollowUpPanel';
 import { ScreeningPanel } from '../components/ScreeningPanel';
@@ -7,12 +8,13 @@ import { useLang, type MessageKey } from '../i18n';
 import { href, navigate } from '../router';
 import { useCases } from '../storage/CasesContext';
 
-export const CASE_TABS = ['overview', 'screening', 'followup'] as const;
+export const CASE_TABS = ['overview', 'screening', 'design', 'followup'] as const;
 export type CaseTab = (typeof CASE_TABS)[number];
 
 const TAB_LABELS: Record<CaseTab, MessageKey> = {
   overview: 'case.tab.overview',
   screening: 'case.tab.screening',
+  design: 'case.tab.design',
   followup: 'case.tab.followUp',
 };
 
@@ -96,6 +98,7 @@ export function CaseViewPage({ caseId, tab }: { caseId: string; tab: CaseTab }) 
       </nav>
 
       {tab === 'screening' && <ScreeningPanel c={c} />}
+      {tab === 'design' && <DesignPanel c={c} />}
       {tab === 'followup' && <FollowUpPanel c={c} />}
       {tab === 'overview' && (
         <>

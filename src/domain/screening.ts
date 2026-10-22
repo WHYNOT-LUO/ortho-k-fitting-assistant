@@ -103,7 +103,7 @@ const SD_LABELS: Record<SdField, MessageKey> = {
 };
 
 /** Pick which corneal curvature to use for R1–R3, in order of preference. */
-function curvatureSource(c: OrthoKCase, eye: Eye) {
+export function curvatureSource(c: OrthoKCase, eye: Eye) {
   const { basic, topography, biometry } = c.eyes[eye];
   if (basic.kK1 !== null && basic.kK2 !== null) return { k1: basic.kK1, k2: basic.kK2, sourceKey: 'src.keratometer' };
   if (topography.simK1_5 !== null && topography.simK2_5 !== null)
