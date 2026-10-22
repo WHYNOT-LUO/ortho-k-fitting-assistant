@@ -512,6 +512,29 @@ export const zh = {
   'img.dir.up': '上方',
   'img.dir.down': '下方',
   'img.scale': '比例：{px} 像素/mm',
+
+  // ---------------------------------------------------------------- Simulated topography maps (demo cases)
+  'map.section': '模拟地形图（演示）',
+  'map.sectionIntro': '根据本病例的 5 mm Sim K、轴位和 e 值，用简化模型画出的示意图，便于演示和讲解。不是真实扫描；真实病例请看设备导出的地形图。',
+  'map.preTitle': '戴镜前 · 轴向曲率图',
+  'map.postTitle': '戴镜后 {date} · 轴向曲率图',
+  'map.simulated': '模拟示意图 · 由病例数字生成，不是真实地形图',
+  'map.basis': '依据：{source} K1 {k1} D @{a1}° / K2 {k2} D @{a2}°，e {e}',
+  'map.src.topography5': '地形图 5 mm Sim K',
+  'map.src.keratometer': '电脑验光仪角膜曲率',
+  'map.src.biometer': '生物测量仪 K',
+  'map.assumed.axes': '轴位缺失，按 K1 @180° 假设',
+  'map.assumed.e': 'e 值缺失，按 0.5 假设',
+  'map.treatment': '模拟矫正量 {amount} D',
+  'map.offset': '治疗区中心向颞下方偏移 {mm} mm',
+  'map.centred': '治疗区居中',
+  'map.check': '自动检查（I1）：中央 3 mm 内红色 {pct}%',
+  'map.checkFlag': '提示 R12',
+  'map.checkOk': '未见红色',
+  'map.download': '下载 PNG',
+  'map.none': '缺少角膜曲率或近视度数，无法生成模拟图。',
+  'map.temporal': '颞侧',
+  'map.nasal': '鼻侧',
 } as const;
 
 export type MessageKey = keyof typeof zh;

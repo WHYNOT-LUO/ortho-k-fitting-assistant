@@ -3,6 +3,7 @@ import { ExamOverview } from '../components/ExamOverview';
 import { FollowUpPanel } from '../components/FollowUpPanel';
 import { ScreeningPanel } from '../components/ScreeningPanel';
 import { SummaryPanel } from '../components/SummaryPanel';
+import { TopoMapView } from '../components/TopoMapView';
 import { formatNumber } from '../domain/fieldSpecs';
 import { EYES, type OrthoKCase } from '../domain/types';
 import { useLang, type MessageKey } from '../i18n';
@@ -44,6 +45,22 @@ function HistoryCard({ c }: { c: OrthoKCase }) {
       </div>
       {h.notes && <p className="small" style={{ marginBottom: 0 }}>{h.notes}</p>}
       {c.notes && <p className="small muted" style={{ marginBottom: 0 }}>{c.notes}</p>}
+    </section>
+  );
+}
+
+/** Pre-fit maps drawn from the numbers. Synthetic cases only: a smooth model could hide real irregularity. */
+function SimulatedMapsCard({ c }: { c: OrthoKCase }) {
+  const { t } = useLang();
+  return (
+    <section className="card">
+      <h3>{t('map.section')}</h3>
+      <p className="card-sub">{t('map.sectionIntro')}</p>
+      <div className="toolbar" style={{ alignItems: 'flex-start', gap: 24 }}>
+        {EYES.filter((e) => c.eyesFitted[e]).map((eye) => (
+          <TopoMapView key={eye} c={c} eye={eye} />
+        ))}
+      </div>
     </section>
   );
 }
@@ -106,6 +123,7 @@ export function CaseViewPage({ caseId, tab }: { caseId: string; tab: CaseTab }) 
       {tab === 'overview' && (
         <>
           <HistoryCard c={c} />
+          {c.synthetic && <SimulatedMapsCard c={c} />}
           <ExamOverview c={c} />
         </>
       )}

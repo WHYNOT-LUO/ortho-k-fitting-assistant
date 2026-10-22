@@ -26,6 +26,7 @@ workflow, the rules (R1–R17) and the test cases (T1–T4).
 | **6. Dashboard** | Trial lenses per case and per eye, the fit-related reorder rate, average visits until a successful fit, the right-first-time rate, and how often the design suggestion was accepted. Includes charts, a per-case table and an optional cost estimate. |
 | **5. Summaries and data** | An optometrist summary and a plain-language note for parents (no medical promises), in both languages. CSV export (one row per eye, one row per visit) and a JSON backup. [`docs/ml-data-plan.md`](docs/ml-data-plan.md) explains the future "best first lens" model. |
 | **Stretch** | Upload a post-wear topography image, mark the centre and scale, and the app counts red pixels in the central 3 mm. Experimental. |
+| **Simulated maps (demo cases)** | Each synthetic case shows axial curvature maps drawn from its own numbers: a pre-fit map from the 5 mm Sim K, axes and e-value, and a post-wear map at each follow-up (blue flattened centre, red ring, decentred when the visit is marked "red inside the central 3 mm"). The image check runs on every post-wear map automatically. Each map is watermarked SIMULATED and can be saved as a PNG for slides. |
 
 The parts were built in the order 1 → 2 → 4 → 3 → 6 → 5 → stretch, with a
 commit after each (`git log`).
@@ -47,7 +48,7 @@ Open the address it prints (usually <http://localhost:5173>). Click **加载合�
 Other commands:
 
 ```bash
-npm test             # runs the 83 automated tests
+npm test             # runs the automated tests
 npm run build        # makes the production version in dist/
 npm run preview      # serves dist/ locally to check the production version
 ```
@@ -95,6 +96,7 @@ src/
     metrics.ts            Part 6: dashboard numbers
     summary.ts            Part 5: optometrist and parent text
     topoImage.ts          stretch: red pixels in the central zone
+    topoMap.ts            simulated pre-fit and post-wear maps for demo cases
     *.test.ts             automated tests (T1–T4 from the notes, boundaries, …)
   storage/                local storage, JSON backup, CSV export
   i18n/zh.ts, en.ts       all wording; TypeScript checks both languages have every key
@@ -114,7 +116,7 @@ docs/ml-data-plan.md      data needed for a future model
    AI search, or added for the app), any assumption we made, and a
    `confirmed` switch. Flags from unconfirmed rules say so on screen.
 3. **Logic separate from screens.** The rules are plain functions that take
-   numbers and return flags. That is why 83 tests can check them, including the
+   numbers and return flags. That is why the automated tests can check them, including the
    exact expected results of test cases T1–T4 from the clinic notes.
 4. **Never silent.** Missing data is shown as "not checked", not as OK. Design
    conflicts show both reasons. A measurement with a high SD (R17) marks the
@@ -174,6 +176,11 @@ checklist for the optometrist. To change a rule:
   JSON backup.
 - **Manual data entry.** Values are typed from printouts. Typos are caught
   only by soft range checks.
+- **Simulated maps are illustrations, not data.** They come from a smooth
+  textbook model (toric conic shape plus a simple ortho-k treatment profile)
+  and carry nothing beyond the numbers they are drawn from. They appear only
+  for synthetic cases, because a smooth map for a real patient could hide real
+  irregularity such as keratoconus.
 - **The image check is a rough experiment.** It depends on the map's colour
   scale, the user's centre and scale clicks, and a 5% threshold that has never
   been tested on real maps.

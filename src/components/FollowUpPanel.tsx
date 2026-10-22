@@ -7,6 +7,8 @@ import { useCases } from '../storage/CasesContext';
 import { AxialChart } from './AxialChart';
 import { FlagItem } from './FlagList';
 import { TopoImageCheck } from './TopoImageCheck';
+import { TopoMapView } from './TopoMapView';
+import { postWearVisits } from '../domain/topoMap';
 import { VisitEditor } from './VisitEditor';
 
 function newVisitId(): string {
@@ -20,6 +22,8 @@ export function FollowUpPanel({ c }: { c: OrthoKCase }) {
   const [editing, setEditing] = useState<Visit | null>(null);
   const eyes = EYES.filter((e) => c.eyesFitted[e]);
   const visits = sortVisits(c.visits).reverse();
+  // Simulated post-wear maps: demo cases only (see domain/topoMap.ts).
+  const mapVisitIds = new Set(c.synthetic ? postWearVisits(c).map((v) => v.id) : []);
 
   const saveVisit = (v: Visit) => {
     const exists = c.visits.some((x) => x.id === v.id);
@@ -140,6 +144,7 @@ export function FollowUpPanel({ c }: { c: OrthoKCase }) {
                   {flags.map((f, i) => (
                     <FlagItem key={i} flag={f} />
                   ))}
+                  {mapVisitIds.has(v.id) && <TopoMapView c={c} eye={eye} visit={v} size={200} />}
                 </div>
               );
             })}
