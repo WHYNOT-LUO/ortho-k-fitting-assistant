@@ -2,6 +2,7 @@ import { useLang } from './i18n';
 import { CaseFormPage } from './pages/CaseFormPage';
 import { CaseListPage } from './pages/CaseListPage';
 import { CASE_TABS, CaseViewPage, type CaseTab } from './pages/CaseViewPage';
+import { DashboardPage } from './pages/DashboardPage';
 import { RulesPage } from './pages/RulesPage';
 import { href, useHashPath } from './router';
 
@@ -17,6 +18,7 @@ function Page({ path }: { path: string[] }) {
     return <CaseViewPage caseId={id} tab={tab} />;
   }
   if (section === 'rules') return <RulesPage />;
+  if (section === 'dashboard') return <DashboardPage />;
   return <p className="muted">{t('common.notFound')}</p>;
 }
 
