@@ -1,0 +1,30 @@
+{
+  "name": "ortho-k-fitting-assistant",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Research and demonstration prototype: decision support for orthokeratology (ortho-k) lens fitting. Not for clinical decisions.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "chart.js": "^4.5.1",
+    "react": "^18.3.1",
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "typescript": "~5.6.3",
+    "vite": "^6.4.5",
+    "vitest": "^5.0.5"
+  }
+}
