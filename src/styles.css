@@ -317,6 +317,17 @@ h3 {
 }
 
 /* ---------- form fields */
+.fgrid {
+  display: grid;
+  gap: 8px 10px;
+  grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+}
+@media (max-width: 560px) {
+  .fgrid:not(.cols-1) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .field {
   display: flex;
   flex-direction: column;
@@ -332,6 +343,7 @@ h3 {
   font-size: 0.75rem;
   color: var(--muted);
 }
+.warn,
 .field .warn {
   font-size: 0.75rem;
   color: var(--caution);
@@ -393,6 +405,23 @@ textarea {
 .check input {
   width: 16px;
   height: 16px;
+}
+
+.savebar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 16px;
+  margin: 0 -16px;
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(4px);
+}
+.savebar .spacer {
+  flex: 1;
 }
 
 /* ---------- tables */

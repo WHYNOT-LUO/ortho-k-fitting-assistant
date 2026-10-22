@@ -18,21 +18,19 @@ describe('clinicRules config', () => {
     }
   });
 
-  it('explains every placeholder rule with an assumption', () => {
-    for (const meta of allRuleMetas().filter((m) => m.source === 'placeholder')) {
-      expect(meta.assumption, meta.id).toBeDefined();
-    }
+  it('includes every rule from the notes (R1–R17)', () => {
+    const ids = new Set(allRuleMetas().map((m) => m.id));
+    for (let n = 1; n <= 17; n++) expect(ids.has(`R${n}`), `R${n}`).toBe(true);
   });
 
   it('keeps ranges in a sensible order', () => {
     const s = clinicRules.screening;
-    expect(s.cornealCurvature.minD).toBeLessThan(s.cornealCurvature.maxD);
-    expect(s.astigmatism.bestMaxD).toBeLessThan(s.astigmatism.toricMaxD);
+    expect(s.kLow.belowD).toBeLessThan(s.kHigh.aboveD);
+    expect(s.astigStandard.bestMaxD).toBeLessThan(s.astigToric.toricMaxD);
     expect(s.eValue.idealMin).toBeLessThan(s.eValue.idealMax);
-    expect(s.eValue.idealMax).toBeLessThanOrEqual(s.eValue.cautionAbove);
     expect(s.cct.normalMinUm).toBeLessThan(s.cct.normalMaxUm);
     const f = clinicRules.followUp;
-    expect(f.axialGrowth.possiblyWeakMmPerYear).toBeLessThan(f.axialGrowth.likelyWeakMmPerYear);
-    expect(f.overRefraction.underCorrectionAtOrBelowD).toBeLessThan(f.overRefraction.overCorrectionAtOrAboveD);
+    expect(f.axialGrowth.possiblyWeakMmPerYear).toBeLessThan(f.axialGrowth.likelyWeakAboveMmPerYear);
+    expect(f.underCorrection.atOrBelowD).toBeLessThan(f.overCorrection.atOrAboveD);
   });
 });

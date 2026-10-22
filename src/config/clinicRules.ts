@@ -1,8 +1,11 @@
 /**
  * CLINIC RULES — the single place for every rule and threshold the app uses.
  *
+ * Source of truth: ortho-k-fitting-notes.md (Section 4 rule table R1–R17,
+ * Section 8 design table, Section 9 open questions Q1–Q7).
+ *
  * How to use this file:
- *  1. Go through each rule with the optometrist.
+ *  1. Go through each rule with the optometrist (the Rules page lists them all).
  *  2. Change the numbers if the clinic uses different ones.
  *  3. Set `confirmed: true` only after the optometrist has agreed to that rule.
  *  4. Bump `RULES_VERSION` whenever you change anything. Each saved design
@@ -10,17 +13,21 @@
  *     traceable after the rules change.
  *
  * `source` says where a rule came from:
- *  - 'clinic'      the clinic told us this rule
- *  - 'ai-search'   came from an AI search; must be checked before use
- *  - 'placeholder' the clinic rule was unclear, so we picked a default (see `assumption`)
+ *  - 'clinic'          the clinic notes (Section 4 of the notes)
+ *  - 'supplier-guide'  the lens supplier's fitting guide (Section 6)
+ *  - 'ai-search'       an AI search, unverified (Section 8)
+ *  - 'app'             added for the app (e.g. R17)
+ * `assumption` explains any number or detail we had to assume. Rules with an
+ * assumption are shown as "contains assumed values" until confirmed.
  *
  * Units: dioptres (D) for curvature and refraction, mm for lengths,
- * μm for corneal thickness. Myopia is negative (−6.00 D = 600 degrees / 600度).
+ * μm for corneal thickness. Myopia and cylinder are negative:
+ * −6.00 D = 600 degrees (600度).
  */
 
-export const RULES_VERSION = '0.1.0';
+export const RULES_VERSION = '0.2.0';
 
-export type RuleSource = 'clinic' | 'ai-search' | 'placeholder';
+export type RuleSource = 'clinic' | 'supplier-guide' | 'ai-search' | 'app';
 
 export interface Bilingual {
   zh: string;
@@ -34,257 +41,351 @@ export interface RuleMeta {
   /** true only after the optometrist has checked this rule. */
   confirmed: boolean;
   description: Bilingual;
-  /** What we assumed where the clinic rule was ambiguous. */
+  /** What we assumed where the clinic rule was unclear. */
   assumption?: Bilingual;
+  /** Open question in Section 9 of the notes that this rule depends on. */
+  question?: string;
 }
 
 export const clinicRules = {
-  // ---------------------------------------------------------------- Part 2
+  // ------------------------------------------------- Part 2: suitability
   screening: {
-    cornealCurvature: {
+    kNormal: {
       meta: {
-        id: 'S1-K-RANGE',
+        id: 'R1',
         source: 'clinic',
         confirmed: false,
         description: {
-          zh: '角膜曲率正常范围 40–46 D。低于 40 D 塑形效果可能较弱；高于 46 D 需先排除圆锥角膜等眼病。',
-          en: 'Normal corneal curvature is 40–46 D. Below 40 D expect a weaker shaping effect; above 46 D rule out eye disease such as keratoconus first.',
+          zh: '角膜曲率 (K) 40–46 D 为正常范围（下限见 R2，上限见 R3）。',
+          en: 'Corneal curvature (K) of 40–46 D is the normal range (lower limit in R2, upper limit in R3).',
         },
         assumption: {
-          zh: '使用角膜地形图 5 mm Sim K1 和 Sim K2（两条子午线都检查）；若无地形图数据则用生物测量仪 K1/K2。',
-          en: 'Uses topography 5 mm Sim K1 and Sim K2 (both meridians); falls back to biometer K1/K2 if topography is missing.',
+          zh: '使用电脑验光仪的角膜曲率 K1 和 K2（两条子午线都检查）。没有时依次用地形图 5 mm Sim K、生物测量仪 K。',
+          en: 'Uses keratometer K1 and K2 from the autorefractor (both meridians). If missing, falls back to topography 5 mm Sim K, then biometer K.',
         },
       } satisfies RuleMeta,
-      minD: 40,
-      maxD: 46,
     },
-
-    myopia: {
+    kLow: {
       meta: {
-        id: 'S2-MYOPIA',
+        id: 'R2',
         source: 'clinic',
         confirmed: false,
         description: {
-          zh: '近视 600 度（−6.00 D）以内效果最好。',
-          en: 'Best results for myopia up to 600 degrees (−6.00 D).',
-        },
-        assumption: {
-          zh: '用电脑验光的球镜度数（不是等效球镜）；超过 −6.00 D 只提示"超出最佳范围"，不判定为不适合。',
-          en: 'Uses autorefractor sphere (not spherical equivalent). Beyond −6.00 D gives an "outside best range" warning, not an exclusion.',
+          zh: '角膜曲率低于 40 D：曲率偏低，预期塑形效果较弱。',
+          en: 'Corneal curvature below 40 D: lower curvature, weaker expected effect.',
         },
       } satisfies RuleMeta,
-      bestMaxMyopiaD: -6.0,
+      belowD: 40,
     },
-
-    astigmatism: {
+    kHigh: {
       meta: {
-        id: 'S3-ASTIG',
+        id: 'R3',
         source: 'clinic',
         confirmed: false,
         description: {
-          zh: '散光 100 度（1.00 D）以内效果最好；100–200 度考虑环曲设计。',
-          en: 'Best results for astigmatism up to 100 degrees (1.00 D); 100–200 degrees: consider a toric design (环曲设计).',
-        },
-        assumption: {
-          zh: '用电脑验光的柱镜度数（屈光散光，不是角膜散光）；超过 200 度只提示，由验光师判断。',
-          en: 'Uses autorefractor cylinder (refractive, not corneal astigmatism). Above 200 degrees gives a warning; the optometrist decides.',
+          zh: '角膜曲率高于 46 D：验配前须先排除圆锥角膜等眼病。停止并转诊。',
+          en: 'Corneal curvature above 46 D: rule out eye disease such as keratoconus (圆锥角膜) before fitting. Stop and refer.',
         },
       } satisfies RuleMeta,
-      bestMaxD: 1.0,
-      toricMaxD: 2.0,
+      aboveD: 46,
     },
-
     eValue: {
       meta: {
-        id: 'S4-E-VALUE',
+        id: 'R4',
         source: 'clinic',
         confirmed: false,
         description: {
-          zh: 'e 值约 0.5 最理想。e 值越高塑形效果越强，但长期配戴可能偏紧（水肿或缺氧风险）。',
-          en: 'An e-value of about 0.5 is ideal. Higher e gives a stronger shaping effect, but the lens may feel tighter over time (oedema or low-oxygen risk).',
+          zh: 'e 值约 0.5 最理想。e 值越高，角膜向周边越平，塑形效果越好，但长期配戴可能偏紧（角膜水肿或缺氧风险）。',
+          en: 'An e-value of about 0.5 is ideal. Higher e means the cornea flattens more toward the edge and shaping works better, but the lens may feel tighter over time (corneal oedema or low-oxygen risk).',
         },
         assumption: {
-          zh: '使用 7 mm 处 e 值；0.40–0.60 为理想，>0.70 提示注意，0.60–0.70 和 <0.40 作一般提示。',
-          en: 'Uses the 7 mm e-value. 0.40–0.60 is ideal; above 0.70 is a caution; 0.60–0.70 and below 0.40 are notes.',
+          zh: '使用 6 mm 处 e 值。0.40–0.60 视为"约 0.5"；高于 0.60 提示偏紧风险；低于 0.40 只作提示。',
+          en: 'Uses e @6 mm. 0.40–0.60 counts as "about 0.5"; above 0.60 warns about tightening; below 0.40 is a note only.',
         },
+        question: 'Q3',
       } satisfies RuleMeta,
-      zoneMm: 7 as 6 | 7 | 8,
+      zoneMm: 6 as 6 | 7 | 8,
       idealMin: 0.4,
       idealMax: 0.6,
-      cautionAbove: 0.7,
     },
-
     cct: {
       meta: {
-        id: 'S5-CCT',
+        id: 'R5',
         source: 'clinic',
         confirmed: false,
         description: {
-          zh: '中央角膜厚度正常 500–550 μm。偏薄则塑形效果较小、可矫正范围有限。',
-          en: 'Normal central corneal thickness is 500–550 μm. Thinner means a smaller effect and a limited correction range.',
-        },
-        assumption: {
-          zh: '高于 550 μm 时只作记录提示，诊所未给出具体规则。',
-          en: 'Above 550 μm is noted only; the clinic gave no specific rule.',
+          zh: '中央角膜厚度正常 500–550 μm。低于范围：效果不明显，可矫正范围有限。',
+          en: 'Normal central corneal thickness is 500–550 μm. Below range: effect not obvious, limited correction range.',
         },
       } satisfies RuleMeta,
       normalMinUm: 500,
       normalMaxUm: 550,
     },
-
     lensThickness: {
       meta: {
-        id: 'S6-LT-CYCLO',
+        id: 'R6',
         source: 'clinic',
         confirmed: false,
         description: {
-          zh: '晶状体厚度 LT > 4 mm 需先做慢散验光，否则测得的近视度数可能不准确。',
-          en: 'Lens thickness (LT) above 4 mm needs cycloplegic refraction (慢散) first, or the measured myopia may be inaccurate.',
+          zh: '晶体厚度 LT > 4 mm：须先做慢散验光，否则测得的近视度数可能不准确。',
+          en: 'Lens thickness (LT) above 4 mm: do cycloplegic refraction (慢散) first, otherwise the measured myopia may be inaccurate.',
+        },
+        assumption: {
+          zh: '若本次验光已勾选"慢散"，则不再提示。',
+          en: 'No flag if the refraction is already marked as cycloplegic.',
         },
       } satisfies RuleMeta,
       cycloplegiaAboveMm: 4.0,
     },
-
-    zoneDifference: {
+    myopia: {
       meta: {
-        id: 'S7-ZONE-DIFF',
-        source: 'placeholder',
+        id: 'R7',
+        source: 'clinic',
         confirmed: false,
         description: {
-          zh: '5 mm Sim K 是主要参考。若 6–8 mm 的数值与其相差超过 0.5，提示参数可能需要调整。',
-          en: '5 mm Sim K is the main reference. If the 6–8 mm values differ from it by more than 0.5, flag that the parameters may need adjusting.',
+          zh: '近视 (S) 600 度（−6.00 D）以内效果最好。超过则超出最佳范围。',
+          en: 'Myopia (S) up to 600 degrees (−6.00 D) gives the best results. More than that is outside the best range.',
+        },
+      } satisfies RuleMeta,
+      bestMaxMyopiaD: -6.0,
+    },
+    astigStandard: {
+      meta: {
+        id: 'R8',
+        source: 'clinic',
+        confirmed: false,
+        description: {
+          zh: '散光 (C) 100 度（−1.00 D）以内：标准设计效果最好。',
+          en: 'Astigmatism (C) up to 100 degrees (−1.00 D): best results with a standard design.',
         },
         assumption: {
-          zh: '比较 7 mm Sim K 与 5 mm Sim K，单位 D，K1 或 K2 任一相差 >0.50 D 即提示。需向诊所确认具体做法。',
-          en: 'Compares 7 mm Sim K with 5 mm Sim K in dioptres; flags if K1 or K2 differs by more than 0.50 D. Ask the clinic how they actually apply this.',
+          zh: '使用电脑验光的柱镜 C（屈光散光）。诊所以角膜散光多少切换环曲设计尚待确认。',
+          en: 'Uses autorefractor cylinder C (refractive astigmatism). The corneal-astigmatism point at which the clinic switches to toric is still open.',
         },
+        question: 'Q6',
+      } satisfies RuleMeta,
+      bestMaxD: 1.0,
+    },
+    astigToric: {
+      meta: {
+        id: 'R9',
+        source: 'clinic',
+        confirmed: false,
+        description: {
+          zh: '散光 (C) 100–200 度（−1.00 至 −2.00 D）：考虑环曲设计。',
+          en: 'Astigmatism (C) of 100–200 degrees (−1.00 to −2.00 D): consider a toric (环曲) design.',
+        },
+        assumption: {
+          zh: '超过 200 度不在诊所规则范围内，提示由验光师判断。',
+          en: 'Above 200 degrees is outside the clinic rules; the app warns and leaves it to the optometrist.',
+        },
+        question: 'Q6',
+      } satisfies RuleMeta,
+      toricMaxD: 2.0,
+    },
+    zoneDifference: {
+      meta: {
+        id: 'R10',
+        source: 'clinic',
+        confirmed: false,
+        description: {
+          zh: '5 mm Sim K 是主要参考；若 6–8 mm 数据相差超过 0.5，参数可能需要上调或下调。',
+          en: '5 mm Sim K is the main reference; if the 6–8 mm data differ by more than 0.5, parameters may need adjusting up or down.',
+        },
+        assumption: {
+          zh: '比较 7 mm 与 5 mm 的 Sim K（单位 D），K1 或 K2 任一相差超过 0.50 D 即提示。不提示调整哪个参数或方向。',
+          en: 'Compares 7 mm with 5 mm Sim K in dioptres; flags if K1 or K2 differs by more than 0.50 D. Does not say which parameter to adjust or in which direction.',
+        },
+        question: 'Q1',
       } satisfies RuleMeta,
       compareZoneMm: 7 as 3 | 7,
       maxDiffD: 0.5,
     },
-
-    extraChecks: {
+    highRiskChild: {
       meta: {
-        id: 'S8-IOP-FUNDUS',
+        id: 'R16',
         source: 'clinic',
         confirmed: false,
         description: {
-          zh: '高度近视、进展快或眼轴长的儿童需做眼压和眼底检查。',
-          en: 'Children with high myopia, fast progression or long axial length need intraocular pressure and fundus checks.',
+          zh: '高风险儿童（高度近视、进展快或眼轴长）：检查眼压和眼底。',
+          en: 'High-risk child (high myopia, fast progression or long axial length): check intraocular pressure and fundus.',
         },
         assumption: {
-          zh: '高度近视 ≤ −6.00 D；进展快 ≥ 0.50 D/年；眼轴长 ≥ 26.0 mm。',
-          en: 'High myopia: −6.00 D or worse. Fast progression: 0.50 D/year or more. Long axial length: 26.0 mm or more.',
+          zh: '高度近视 ≤ −6.00 D；进展快 ≥ 0.50 D/年；眼轴长 ≥ 26.00 mm。对所有年龄适用。',
+          en: 'High myopia: −6.00 D or worse. Fast progression: 0.50 D/year or more. Long axial length: 26.00 mm or more. Applied at any age.',
         },
       } satisfies RuleMeta,
       highMyopiaD: -6.0,
       fastProgressionDPerYear: 0.5,
       longAxialLengthMm: 26.0,
     },
-
-    ocularSurface: {
+    measurementSd: {
       meta: {
-        id: 'S9-SURFACE',
+        id: 'R17',
+        source: 'app',
+        confirmed: false,
+        description: {
+          zh: '多次测量的标准差 (SD) 过大：测量不可靠，请重新测量。',
+          en: 'High SD across repeated readings: the measurement is unreliable; re-measure.',
+        },
+        assumption: {
+          zh: 'SD 上限为暂定值：AL 0.02 mm，CCT 10 μm，AD/LT/VT 0.05 mm，K1/K2 0.25 D。由读数计算时用总体标准差。',
+          en: 'SD limits are placeholders: AL 0.02 mm, CCT 10 μm, AD/LT/VT 0.05 mm, K1/K2 0.25 D. SD computed from readings uses the population SD.',
+        },
+      } satisfies RuleMeta,
+      maxSd: { al: 0.02, cct: 10, ad: 0.05, lt: 0.05, vt: 0.05, k1: 0.25, k2: 0.25 },
+    },
+    keratoconusPanel: {
+      meta: {
+        id: 'N1',
         source: 'clinic',
         confirmed: false,
         description: {
-          zh: '基础检查中角膜或眼表异常，需先处理再验配。',
-          en: 'Cornea or ocular surface marked abnormal in the basic tests: resolve before fitting.',
+          zh: '地形图圆锥角膜筛查必须正常才能验配（笔记 3.3 节）。',
+          en: 'The topography keratoconus screening panel must be clear before fitting (notes Section 3.3).',
         },
       } satisfies RuleMeta,
     },
-
-    allergicRhinitis: {
+    ocularSurface: {
       meta: {
-        id: 'S10-RHINITIS',
-        source: 'placeholder',
+        id: 'N2',
+        source: 'clinic',
         confirmed: false,
         description: {
-          zh: '病史中记录了严重过敏性鼻炎。',
-          en: 'Severe allergic rhinitis recorded in the history.',
+          zh: '基础检查中角膜或眼表健康异常：先处理再验配（笔记第 2 节）。',
+          en: 'Cornea or ocular surface marked abnormal in the basic tests: resolve before fitting (notes Section 2).',
         },
         assumption: {
-          zh: '诊所把它列入病史，但未说明如何影响验配，所以只作提示。',
-          en: 'The clinic lists it in the history but did not say how it changes the fitting, so it is a note only.',
+          zh: '诊所未写明处理方式，提示级别为"注意"。',
+          en: 'The notes do not say what to do, so this is a caution.',
+        },
+      } satisfies RuleMeta,
+    },
+    allergicRhinitis: {
+      meta: {
+        id: 'N3',
+        source: 'clinic',
+        confirmed: false,
+        description: {
+          zh: '病史中记录了严重过敏性鼻炎（笔记第 2 节）。',
+          en: 'Severe allergic rhinitis recorded in the history (notes Section 2).',
+        },
+        assumption: {
+          zh: '笔记把它列入病史，但未说明如何影响验配，所以只作提示。',
+          en: 'The notes list it in the history but do not say how it changes the fitting, so it is a note only.',
         },
       } satisfies RuleMeta,
     },
   },
 
-  // ---------------------------------------------------------------- Part 3
-  // These came from an AI search. They MUST be confirmed by the optometrist.
+  // ------------------------------------------- Trial lens evaluation
+  trialFitting: {
+    fluorescein: {
+      meta: {
+        id: 'G1',
+        source: 'supplier-guide',
+        confirmed: false,
+        description: {
+          zh: '荧光评估：偏松 → 曲率加一档；适中 → 保持；偏紧 → 曲率减一档。重复直到适中。',
+          en: 'Fluorescein: loose → increase curvature one step; ideal → keep; tight → decrease curvature one step. Repeat until ideal.',
+        },
+        assumption: {
+          zh: '档位大小（0.25 或 0.5）和初始曲率范围在指南照片中被截掉，本应用只提示方向，不计算数值。',
+          en: 'Step sizes (0.25 or 0.5) and the initial curvature range were cut off in the guide photo, so the app only shows the direction, never a value.',
+        },
+        question: 'Q5',
+      } satisfies RuleMeta,
+    },
+    tearLayer: {
+      meta: {
+        id: 'R15',
+        source: 'clinic',
+        confirmed: false,
+        description: {
+          zh: '荧光下泪液层某一方向过厚：该方向压力不足。垂直方向多为散光，考虑环曲设计。',
+          en: 'Fluorescein tear layer too thick in one direction: not enough pressure in that direction. Vertical: likely astigmatism; consider toric.',
+        },
+      } satisfies RuleMeta,
+    },
+  },
+
+  // ------------------------------------------- Part 3: design suggestion
+  // From an AI search (notes Section 8). UNVERIFIED: suggestion only.
+  // When 4-curve and 5-curve rules both match, the app shows BOTH reasons and
+  // leaves the choice to the optometrist. It never picks one silently (Q4).
   design: {
     fourCurveLowMyopia: {
       meta: {
-        id: 'D1-4C-LOW',
+        id: 'D1',
         source: 'ai-search',
         confirmed: false,
         description: {
-          zh: '低到中度近视（浅于 −4.00 D）且角膜规则 → 四弧区设计。',
-          en: 'Low-to-moderate myopia (less myopic than −4.00 D) with a regular cornea → 4-curve.',
+          zh: '低到中度近视（浅于 −4.00 D）且角膜规则 → 四弧区：矫正快，离焦强。',
+          en: 'Low-to-moderate myopia (less myopic than −4.00 D) with a regular cornea → 4-curve: fast correction, strong defocus.',
         },
+        question: 'Q4',
       } satisfies RuleMeta,
-      myopiaLimitD: -4.0,
-    },
-    fourCurveFastCorrection: {
-      meta: {
-        id: 'D2-4C-FAST',
-        source: 'ai-search',
-        confirmed: false,
-        description: {
-          zh: '需要快速矫正 → 四弧区设计。',
-          en: 'A need for fast correction → 4-curve.',
-        },
-      } satisfies RuleMeta,
+      lessMyopicThanD: -4.0,
     },
     fiveCurveHighMyopia: {
       meta: {
-        id: 'D3-5C-HIGH',
+        id: 'D2',
         source: 'ai-search',
         confirmed: false,
         description: {
-          zh: '近视 −4.00 D 及以上 → 五弧区设计（定位更稳定）。',
-          en: 'Myopia of −4.00 D or more → 5-curve (more stable centring).',
+          zh: '高度近视 → 五弧区：定位更稳定，偏位和不对称离焦更少。',
+          en: 'High myopia → 5-curve: more stable centring, less decentration and asymmetric defocus.',
         },
+        assumption: {
+          zh: '"高度近视"指 −4.00 D 及以上（即不属于 D1 的低到中度）。',
+          en: '"High myopia" means −4.00 D or more myopic (everything not low-to-moderate in D1).',
+        },
+        question: 'Q4',
       } satisfies RuleMeta,
-      myopiaAtOrBeyondD: -4.0,
+      atOrBeyondD: -4.0,
     },
     fiveCurveAstigmatism: {
       meta: {
-        id: 'D4-5C-ASTIG',
+        id: 'D3',
         source: 'ai-search',
         confirmed: false,
         description: {
-          zh: '散光大于 1.50 D → 五弧区设计。',
-          en: 'Astigmatism over 1.50 D → 5-curve.',
+          zh: '散光大于 1.50 D → 五弧区：定位更稳定。',
+          en: 'Astigmatism over 1.50 D → 5-curve: more stable centring.',
         },
+        assumption: {
+          zh: '使用电脑验光柱镜 C 的绝对值。',
+          en: 'Uses the size of the autorefractor cylinder C.',
+        },
+        question: 'Q6',
       } satisfies RuleMeta,
-      astigAboveD: 1.5,
+      aboveD: 1.5,
     },
     fiveCurveChild: {
       meta: {
-        id: 'D5-5C-CHILD',
+        id: 'D4',
         source: 'ai-search',
         confirmed: false,
         description: {
-          zh: '儿童 → 五弧区设计。',
-          en: 'Children → 5-curve.',
+          zh: '儿童 → 五弧区：更安全，耐受更好。',
+          en: 'Children → 5-curve: safer, better tolerated.',
         },
         assumption: {
           zh: '"儿童"指 12 岁以下。',
           en: '"Child" means under 12 years old.',
         },
+        question: 'Q4',
       } satisfies RuleMeta,
-      childUnderAgeYears: 12,
+      underAgeYears: 12,
     },
     fiveCurveSensitive: {
       meta: {
-        id: 'D6-5C-SENSITIVE',
+        id: 'D5',
         source: 'ai-search',
         confirmed: false,
         description: {
-          zh: '角膜敏感 → 五弧区设计。',
-          en: 'Sensitive cornea → 5-curve.',
+          zh: '角膜敏感 → 五弧区：更安全，耐受更好。',
+          en: 'Sensitive cornea → 5-curve: safer, better tolerated.',
         },
         assumption: {
           zh: '由验光师在基础检查中勾选"角膜敏感"。',
@@ -292,106 +393,139 @@ export const clinicRules = {
         },
       } satisfies RuleMeta,
     },
-    regularCornea: {
+    fourCurveFast: {
       meta: {
-        id: 'D7-REGULAR',
-        source: 'placeholder',
+        id: 'D6',
+        source: 'ai-search',
         confirmed: false,
         description: {
-          zh: '"角膜规则"的判断标准。',
-          en: 'What counts as a "regular cornea".',
+          zh: '患者希望短期内快速矫正 → 四弧区：起效更快。',
+          en: 'Patient wants fast short-term correction → 4-curve: works faster.',
+        },
+      } satisfies RuleMeta,
+    },
+    regularCornea: {
+      meta: {
+        id: 'D7',
+        source: 'app',
+        confirmed: false,
+        description: {
+          zh: 'D1 中"角膜规则"的判断标准。',
+          en: 'What counts as a "regular cornea" in D1.',
         },
         assumption: {
-          zh: '5 mm 角膜散光（|Sim K2 − Sim K1|）≤ 1.50 D，曲率在 40–46 D 内，且 7 mm 与 5 mm 相差不超过 0.50 D。',
-          en: '5 mm corneal astigmatism (|Sim K2 − Sim K1|) of 1.50 D or less, curvature within 40–46 D, and 7 mm within 0.50 D of 5 mm.',
+          zh: '角膜散光（K2 − K1）≤ 1.50 D，曲率在 R2–R3 之间，没有 R10 提示，圆锥角膜筛查不是"可疑"。',
+          en: 'Corneal astigmatism (K2 − K1) of 1.50 D or less, curvature between the R2 and R3 limits, no R10 flag, and the keratoconus panel not "suspect".',
         },
       } satisfies RuleMeta,
       maxCornealAstigD: 1.5,
     },
-    tieBreak: {
-      meta: {
-        id: 'D8-TIE',
-        source: 'placeholder',
-        confirmed: false,
-        description: {
-          zh: '四弧区和五弧区规则同时满足时，以哪个为准。',
-          en: 'Which design wins when both 4-curve and 5-curve rules match.',
-        },
-        assumption: {
-          zh: '任何一条五弧区规则满足即建议五弧区。',
-          en: 'Any matching 5-curve rule wins.',
-        },
-      } satisfies RuleMeta,
-      winner: '5-curve' as '4-curve' | '5-curve',
-    },
   },
 
-  // ---------------------------------------------------------------- Part 4
+  // ------------------------------------------------- Part 4: follow-up
   followUp: {
     axialGrowth: {
       meta: {
-        id: 'F1-AL-GROWTH',
-        source: 'placeholder',
+        id: 'R11',
+        source: 'clinic',
         confirmed: false,
         description: {
-          zh: '眼轴增长 0.2–0.3 mm 提示近视控制可能偏弱（也可能是正常生长）。',
-          en: 'Axial length growth of 0.2–0.3 mm suggests possibly weak myopia control (it can also be normal growth).',
+          zh: '眼轴增长 +0.2 至 0.3 mm：近视控制可能偏弱，也可能是正常生理性增长。',
+          en: 'Axial length growth of +0.2 to 0.3 mm: possibly weak myopia control. It may also be normal physiological growth.',
         },
         assumption: {
-          zh: '按每 12 个月计算（按实际间隔折算成年增长）；两次测量间隔至少 6 个月才判断；>0.3 mm/年提示"控制可能不足"。需向诊所确认时间窗口。',
-          en: 'Measured per 12 months (scaled from the actual gap between measurements); needs at least 6 months between measurements; above 0.3 mm/year is "likely weak control". Ask the clinic for their time window.',
+          zh: '按 12 个月计算：取最近一次测量与约 12 个月前的测量比较，按实际间隔折算为每年增长；间隔不足 6 个月不判断。>0.30 mm/年提示"控制可能不足"。未按年龄区分。',
+          en: 'Per 12 months: compares the latest reading with the one about 12 months earlier, scaled to growth per year; no judgement if the gap is under 6 months. Above 0.30 mm/year is "likely weak control". Not age-specific.',
         },
+        question: 'Q2',
       } satisfies RuleMeta,
       windowMonths: 12,
       minGapMonths: 6,
       possiblyWeakMmPerYear: 0.2,
-      likelyWeakMmPerYear: 0.3,
-    },
-    overRefraction: {
-      meta: {
-        id: 'F2-OVER-REFRACTION',
-        source: 'placeholder',
-        confirmed: false,
-        description: {
-          zh: '追加验光判断塑形力度：欠矫（力度不足）或过矫（力度过大，出现远视）。',
-          en: 'Over-refraction shows whether the treatment force is right: under-correction (not enough force) or over-correction (too much force, causing hyperopia).',
-        },
-        assumption: {
-          zh: '残余 ≤ −0.50 D 为欠矫；≥ +0.50 D 为过矫。',
-          en: 'Residual of −0.50 D or more myopic is under-correction; +0.50 D or more is over-correction.',
-        },
-      } satisfies RuleMeta,
-      underCorrectionAtOrBelowD: -0.5,
-      overCorrectionAtOrAboveD: 0.5,
+      likelyWeakAboveMmPerYear: 0.3,
     },
     centralRed: {
       meta: {
-        id: 'F3-CENTRAL-RED',
+        id: 'R12',
         source: 'clinic',
         confirmed: false,
         description: {
-          zh: '戴镜后地形图中央 3 mm 区域内出现红色：可能偏位、镜下气泡或干燥点。',
-          en: 'Red inside the central 3 mm zone on post-wear topography: possible decentration, an air bubble under the lens, or a dry spot.',
+          zh: '戴镜后地形图中央 3 mm 内出现红色：可能偏位、镜下气泡或干燥点。（正常应为黄到蓝。）',
+          en: 'Red inside the central 3 mm on post-wear topography: possible decentration, an air bubble, or a dry spot. (Normal wear shows yellow to blue.)',
         },
       } satisfies RuleMeta,
       zoneDiameterMm: 3,
     },
+    underCorrection: {
+      meta: {
+        id: 'R13',
+        source: 'clinic',
+        confirmed: false,
+        description: {
+          zh: '戴镜验光有残余近视：塑形力度不足。',
+          en: 'Residual myopia on over-refraction: treatment force not enough.',
+        },
+        assumption: {
+          zh: '残余 ≤ −0.50 D 才提示。',
+          en: 'Flags at −0.50 D or more myopic.',
+        },
+      } satisfies RuleMeta,
+      atOrBelowD: -0.5,
+    },
+    overCorrection: {
+      meta: {
+        id: 'R14',
+        source: 'clinic',
+        confirmed: false,
+        description: {
+          zh: '戴镜验光过矫或出现远视：压力过大。',
+          en: 'Over-corrected or hyperopic on over-refraction: pressure too high.',
+        },
+        assumption: {
+          zh: '≥ +0.50 D 才提示。',
+          en: 'Flags at +0.50 D or more.',
+        },
+      } satisfies RuleMeta,
+      atOrAboveD: 0.5,
+    },
   },
 
-  // ---------------------------------------------------------- Stretch goal
+  // ------------------------------------------------- Part 6: business case
+  business: {
+    clinicBaseline: {
+      meta: {
+        id: 'B1',
+        source: 'clinic',
+        confirmed: false,
+        description: {
+          zh: '诊所现有的典型数字，用于和本应用记录的数据对比。',
+          en: 'The clinic’s current typical numbers, to compare against what the app records.',
+        },
+        assumption: {
+          zh: '尚未提供；在看板中显示为"待填"。',
+          en: 'Not provided yet; the dashboard shows them as "to be filled in".',
+        },
+        question: 'Q7',
+      } satisfies RuleMeta,
+      avgTrialLensesPerCase: null as number | null,
+      reorderRatePercent: null as number | null,
+    },
+  },
+
+  // ------------------------------------------------- Stretch goal
   imageCheck: {
     centralRedFraction: {
       meta: {
-        id: 'X1-IMAGE-RED',
-        source: 'placeholder',
+        id: 'I1',
+        source: 'app',
         confirmed: false,
         description: {
-          zh: '（实验功能）从上传的地形图图片中自动检测中央 3 mm 内的红色像素。',
-          en: '(Experimental) Detects red pixels inside the central 3 mm of an uploaded topography map image.',
+          zh: '（实验功能）从上传的戴镜后地形图图片中检测中央 3 mm 内的红色像素。',
+          en: '(Experimental) Detects red pixels inside the central 3 mm of an uploaded post-wear topography image.',
         },
         assumption: {
           zh: '中央区内红色像素超过 5% 即提示。阈值未经验证。',
-          en: 'Flags when more than 5% of central-zone pixels are red. Threshold is unvalidated.',
+          en: 'Flags when more than 5% of central-zone pixels are red. The threshold is unvalidated.',
         },
       } satisfies RuleMeta,
       redFractionThreshold: 0.05,
