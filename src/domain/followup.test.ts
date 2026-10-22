@@ -42,6 +42,13 @@ describe('axial length (R11)', () => {
     expect(g.flag?.level).toBe('info');
   });
 
+  it('counts a "6-month" visit booked a few days early (182 days)', () => {
+    const c = buildCase(T1_INPUT);
+    c.examDate = '2025-12-01';
+    c.visits = [buildVisit('v6', '2026-06-01', 'follow-up', { OD: { al: 24.85 } })];
+    expect(axialGrowth(c, 'OD').flag?.code).not.toBe('R11.tooSoon');
+  });
+
   it('flags above 0.30 mm/year as likely weak, and slow growth as ok', () => {
     const fast = buildCase(T1_INPUT);
     fast.visits = [buildVisit('v', '2026-09-15', 'follow-up', { OD: { al: 25.2 } })];

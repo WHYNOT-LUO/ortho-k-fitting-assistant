@@ -17,6 +17,8 @@ import type { Adjustment, Eye, Fluorescein, OrthoKCase, TrialLens, Visit } from 
 const r2 = (x: number) => Math.round(x * 100) / 100;
 const fmtSigned = (x: number) => (x > 0 ? `+${x.toFixed(2)}` : x.toFixed(2));
 const DAY_MS = 24 * 60 * 60 * 1000;
+/** A "6-month" visit is often booked a few days early; allow about a week. */
+const GAP_TOLERANCE_MONTHS = 0.25;
 
 function dayNumber(date: string): number {
   const [y, m, d] = date.split('-').map(Number);
@@ -75,7 +77,7 @@ export function axialGrowth(c: OrthoKCase, eye: Eye): AxialGrowth {
 
   const to = series[series.length - 1];
   const earlier = series.slice(0, -1);
-  const candidates = earlier.filter((p) => monthsBetween(p.date, to.date) >= rule.minGapMonths);
+  const candidates = earlier.filter((p) => monthsBetween(p.date, to.date) >= rule.minGapMonths - GAP_TOLERANCE_MONTHS);
 
   if (candidates.length === 0) {
     const months = monthsBetween(earlier[0].date, to.date);

@@ -6,8 +6,11 @@ import { EYES } from '../domain/types';
 import { useLang } from '../i18n';
 import { href, navigate } from '../router';
 import { backupJson, mergeCases, parseCases } from '../storage/caseStore';
+import { eyesCsv, visitsCsv } from '../storage/csvExport';
 import { useCases } from '../storage/CasesContext';
 import { downloadText } from '../storage/download';
+
+const stamp = () => new Date().toISOString().slice(0, 10);
 
 export function CaseListPage() {
   const { t } = useLang();
@@ -62,9 +65,25 @@ export function CaseListPage() {
           <button
             className="btn"
             disabled={cases.length === 0}
-            onClick={() => downloadText(`orthok-backup-${new Date().toISOString().slice(0, 10)}.json`, backupJson(cases), 'application/json')}
+            onClick={() => downloadText(`orthok-backup-${stamp()}.json`, backupJson(cases), 'application/json')}
           >
             {t('cases.backup')}
+          </button>
+          <button
+            className="btn"
+            disabled={cases.length === 0}
+            title={t('export.note')}
+            onClick={() => downloadText(`orthok-eyes-${stamp()}.csv`, eyesCsv(sorted), 'text/csv')}
+          >
+            {t('export.csvEyes')}
+          </button>
+          <button
+            className="btn"
+            disabled={cases.length === 0}
+            title={t('export.note')}
+            onClick={() => downloadText(`orthok-visits-${stamp()}.csv`, visitsCsv(sorted), 'text/csv')}
+          >
+            {t('export.csvVisits')}
           </button>
           <button className="btn" onClick={() => fileInput.current?.click()}>
             {t('cases.import')}
@@ -83,6 +102,9 @@ export function CaseListPage() {
         </div>
       </div>
 
+      <p className="small muted" style={{ marginTop: -8 }}>
+        {t('export.note')}
+      </p>
       {error && <div className="notice level-stop">{t('cases.storageError', { error })}</div>}
       {message && <div className="notice level-info">{message}</div>}
 

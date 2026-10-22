@@ -434,8 +434,8 @@ export const clinicRules = {
           en: 'Axial length growth of +0.2 to 0.3 mm: possibly weak myopia control. It may also be normal physiological growth.',
         },
         assumption: {
-          zh: '按 12 个月计算：取最近一次测量与约 12 个月前的测量比较，按实际间隔折算为每年增长；间隔不足 6 个月不判断。>0.30 mm/年提示"控制可能不足"。未按年龄区分。',
-          en: 'Per 12 months: compares the latest reading with the one about 12 months earlier, scaled to growth per year; no judgement if the gap is under 6 months. Above 0.30 mm/year is "likely weak control". Not age-specific.',
+          zh: '按 12 个月计算：取最近一次测量与约 12 个月前的测量比较，按实际间隔折算为每年增长；间隔不足 6 个月（允许约 1 周误差）不判断。>0.30 mm/年提示"控制可能不足"。未按年龄区分。',
+          en: 'Per 12 months: compares the latest reading with the one about 12 months earlier, scaled to growth per year; no judgement if the gap is under 6 months (about a week of slack allowed). Above 0.30 mm/year is "likely weak control". Not age-specific.',
         },
         question: 'Q2',
       } satisfies RuleMeta,

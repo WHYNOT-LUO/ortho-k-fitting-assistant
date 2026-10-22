@@ -2,13 +2,14 @@ import { DesignPanel } from '../components/DesignPanel';
 import { ExamOverview } from '../components/ExamOverview';
 import { FollowUpPanel } from '../components/FollowUpPanel';
 import { ScreeningPanel } from '../components/ScreeningPanel';
+import { SummaryPanel } from '../components/SummaryPanel';
 import { formatNumber } from '../domain/fieldSpecs';
 import { EYES, type OrthoKCase } from '../domain/types';
 import { useLang, type MessageKey } from '../i18n';
 import { href, navigate } from '../router';
 import { useCases } from '../storage/CasesContext';
 
-export const CASE_TABS = ['overview', 'screening', 'design', 'followup'] as const;
+export const CASE_TABS = ['overview', 'screening', 'design', 'followup', 'summary'] as const;
 export type CaseTab = (typeof CASE_TABS)[number];
 
 const TAB_LABELS: Record<CaseTab, MessageKey> = {
@@ -16,6 +17,7 @@ const TAB_LABELS: Record<CaseTab, MessageKey> = {
   screening: 'case.tab.screening',
   design: 'case.tab.design',
   followup: 'case.tab.followUp',
+  summary: 'case.tab.summary',
 };
 
 function HistoryCard({ c }: { c: OrthoKCase }) {
@@ -100,6 +102,7 @@ export function CaseViewPage({ caseId, tab }: { caseId: string; tab: CaseTab }) 
       {tab === 'screening' && <ScreeningPanel c={c} />}
       {tab === 'design' && <DesignPanel c={c} />}
       {tab === 'followup' && <FollowUpPanel c={c} />}
+      {tab === 'summary' && <SummaryPanel c={c} />}
       {tab === 'overview' && (
         <>
           <HistoryCard c={c} />
