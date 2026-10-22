@@ -7,8 +7,12 @@
   --muted: #5d6d78;
   --primary: #0f6e8c;
   --primary-soft: #e2f1f6;
-  --od: #0f6e8c; /* right eye colour */
-  --os: #b4572b; /* left eye colour */
+  /* Eye colours: validated for colour-blind separation (dataviz palette slots 1 and 2).
+     The tag colours are darker steps so white text on them stays readable. */
+  --od: #2a78d6; /* right eye */
+  --os: #eb6834; /* left eye */
+  --od-tag: #1f64b8;
+  --os-tag: #b8461b;
 
   --ok: #1f7a4d;
   --ok-soft: #e3f4ea;
@@ -295,10 +299,10 @@ h3 {
   margin-right: 6px;
 }
 .eye-tag.OD {
-  background: var(--od);
+  background: var(--od-tag);
 }
 .eye-tag.OS {
-  background: var(--os);
+  background: var(--os-tag);
 }
 .eye-head {
   display: flex;
@@ -425,6 +429,23 @@ textarea {
 }
 .savebar .spacer {
   flex: 1;
+}
+
+.trial-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  background: var(--surface);
+}
+.trial-index {
+  font-weight: 600;
+  color: var(--muted);
+  padding-top: 22px;
+  min-width: 22px;
 }
 
 /* ---------- tables */

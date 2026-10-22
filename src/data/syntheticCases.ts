@@ -90,6 +90,22 @@ export const T1_INPUT: CaseInput = {
       topography: { simK1_5: 42.3, simK2_5: 43.0, e6: 0.52 },
     },
   },
+  // Follow-up from the notes: AL 24.80 → 24.86 (6 months) → 25.08 (12 months),
+  // red in central 3 mm at 12 months. The fitting visits are made up for the demo.
+  visits: [
+    buildVisit('T1-v1', '2025-09-22', 'fitting', {
+      OD: {
+        trials: [
+          { lens: 'TL-1 (synthetic)', fluorescein: 'tight', thickDirection: 'none', adjustment: 'flatter', notes: '' },
+          { lens: 'TL-2 (synthetic)', fluorescein: 'ideal', thickDirection: 'none', adjustment: 'keep', notes: '' },
+        ],
+      },
+    }),
+    buildVisit('T1-v2', '2025-10-06', 'delivery', { OD: {} }),
+    buildVisit('T1-v3', '2025-10-13', 'follow-up', { OD: { overRefraction: -0.25, fitSuccessful: true } }),
+    buildVisit('T1-v4', '2026-03-15', 'follow-up', { OD: { al: 24.86 } }),
+    buildVisit('T1-v5', '2026-09-15', 'follow-up', { OD: { al: 25.08, redInCentral3mm: true, topoNotes: 'red in central 3 mm' } }),
+  ],
   notes: 'Notes test case T1 (synthetic).',
 };
 
@@ -130,6 +146,7 @@ const t4Stats = meanAndSd(T4_CCT_READINGS)!;
 export const T4_INPUT: CaseInput = {
   ...T1_INPUT,
   id: 'DEMO-T4',
+  visits: [],
   eyes: {
     OD: {
       ...T1_INPUT.eyes.OD,
