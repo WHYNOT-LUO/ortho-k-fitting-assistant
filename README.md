@@ -50,6 +50,7 @@ Other commands:
 ```bash
 npm test             # runs the automated tests
 npm run build        # makes the production version in dist/
+npm run build:offline  # makes the single offline HTML file in offline/
 npm run preview      # serves dist/ locally to check the production version
 ```
 
@@ -74,6 +75,28 @@ deploy script is already in `.github/workflows/deploy.yml`.
 
 **Alternative (no GitHub):** run `npm run build`, then drag the `dist` folder
 onto <https://app.netlify.com/drop>.
+
+## Offline version (for mainland China without a VPN)
+
+`github.io` often opens in mainland China, but it can be slow or blocked. For
+demos there, use the offline version: the whole app in **one HTML file** that
+opens by double-clicking, with no internet connection.
+
+```bash
+npm run build:offline
+```
+
+This creates `offline/ortho-k-fitting-assistant-offline.html` (about 490 KB).
+Send it by WeChat, email or USB; the person double-clicks it to open.
+
+- Use **Chrome or Edge** (or another Chromium browser such as 360 or QQ
+  Browser). Data is saved in that browser on that computer, as with the
+  website. A note at the bottom of the page reminds users of this.
+- Phones are awkward: WeChat on a phone usually can't open `.html` files
+  directly, so use a computer.
+- The offline file and the website keep **separate** data. Use
+  Backup (JSON) and Import backup to move cases between them.
+- Rebuild the file after changing the app; the `offline/` folder is not committed.
 
 > `ortho-k-fitting-notes.md` (your clinic notes) is **not** committed yet.
 > Decide whether you want it public before adding it to the repository.

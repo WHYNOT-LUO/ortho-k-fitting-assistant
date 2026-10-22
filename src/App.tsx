@@ -61,7 +61,10 @@ export function App() {
       <main className="main">
         <Page path={path} />
       </main>
-      <footer className="footer">{t('app.privacy')}</footer>
+      <footer className="footer">
+        {window.location.protocol === 'file:' && <div style={{ marginBottom: 4, color: 'var(--caution)' }}>{t('app.offline')}</div>}
+        {t('app.privacy')}
+      </footer>
     </div>
   );
 }

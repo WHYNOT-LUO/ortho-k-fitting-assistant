@@ -538,4 +538,5 @@ export const en: Record<MessageKey, string> = {
   'map.none': 'Not enough curvature or refraction data to draw a map.',
   'map.temporal': 'temporal',
   'map.nasal': 'nasal',
+  'app.offline': 'Offline version: works without internet. Data is saved only in this browser on this computer; use Chrome or Edge, and back up regularly.',
 };

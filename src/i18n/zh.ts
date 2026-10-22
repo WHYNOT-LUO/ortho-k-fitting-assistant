@@ -535,6 +535,7 @@ export const zh = {
   'map.none': '缺少角膜曲率或近视度数，无法生成模拟图。',
   'map.temporal': '颞侧',
   'map.nasal': '鼻侧',
+  'app.offline': '离线版：无需联网，双击即可打开。数据只保存在这台电脑的这个浏览器里，建议用 Chrome 或 Edge 打开，并定期备份。',
 } as const;
 
 export type MessageKey = keyof typeof zh;
