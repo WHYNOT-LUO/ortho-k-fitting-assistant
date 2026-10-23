@@ -21,7 +21,10 @@ type Cell = string | number | boolean | null | undefined;
 export function csvEscape(value: Cell): string {
   if (value === null || value === undefined) return '';
   if (typeof value === 'boolean') return value ? '1' : '0';
-  const s = String(value);
+  let s = String(value);
+  // Text starting with = + - @ (or a tab/return) would run as a formula in
+  // Excel; prefix an apostrophe so it stays text. Real numbers are unaffected.
+  if (typeof value === 'string' && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
   return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 

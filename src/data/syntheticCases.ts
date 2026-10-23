@@ -9,6 +9,7 @@
  * exported with synthetic = 1, so it can never be mistaken for clinic data.
  */
 import { makeDecision, suggestDesign } from '../domain/design';
+import { round2 } from '../domain/format';
 import {
   emptyCase,
   emptyVisit,
@@ -181,7 +182,7 @@ interface EyeSpec {
 }
 
 function fullEye(p: EyeSpec, extra: Partial<BasicTests> = {}): EyeInput {
-  const r2 = (x: number) => Math.round(x * 100) / 100;
+  const r2 = round2;
   return {
     basic: {
       vaUncorrected: '4.6',

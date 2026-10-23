@@ -14,6 +14,7 @@
  */
 import { RULES_VERSION, clinicRules } from '../config/clinicRules';
 import type { MessageKey } from '../i18n/zh';
+import { formatFixed, formatSigned, round2 } from './format';
 import { curvatureSource, screenEye } from './screening';
 import type { DesignDecision, DesignType, Eye, OrthoKCase } from './types';
 
@@ -46,8 +47,8 @@ export interface DesignSuggestion {
   missing: MessageKey[];
 }
 
-const r2 = (x: number) => Math.round(x * 100) / 100;
-const fmtSigned = (x: number) => (x > 0 ? `+${x.toFixed(2)}` : x.toFixed(2));
+const r2 = round2;
+const fmtSigned = formatSigned;
 
 function regularCornea(c: OrthoKCase, eye: Eye, zoneDiffFlag: boolean) {
   const k = curvatureSource(c, eye);
@@ -79,8 +80,8 @@ export function suggestDesign(c: OrthoKCase, eye: Eye): DesignSuggestion {
   if (basic.sphere === null) {
     missing.push('field.sphere');
   } else if (r2(basic.sphere) <= d.fiveCurveHighMyopia.atOrBeyondD) {
-    add(five, 'D2', '5-curve', 'D2', { sphere: fmtSigned(basic.sphere), limit: d.fiveCurveHighMyopia.atOrBeyondD.toFixed(2) });
-  } else if (r2(basic.sphere) > d.fourCurveLowMyopia.lessMyopicThanD) {
+    add(five, 'D2', '5-curve', 'D2', { sphere: fmtSigned(basic.sphere), limit: formatFixed(d.fiveCurveHighMyopia.atOrBeyondD) });
+  } else if (basic.sphere < 0 && r2(basic.sphere) > d.fourCurveLowMyopia.lessMyopicThanD) {
     if (regular.regular === true) {
       add(four, 'D1', '4-curve', 'D1', { sphere: fmtSigned(basic.sphere), astig: regular.astig?.toFixed(2) ?? '—' });
     } else if (regular.regular === null) {

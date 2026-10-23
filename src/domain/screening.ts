@@ -16,6 +16,7 @@
  */
 import { clinicRules } from '../config/clinicRules';
 import type { MessageKey } from '../i18n/zh';
+import { formatFixed, formatSigned, round2 } from './format';
 import { EYES, SD_FIELDS, meanAndSd, type Eye, type OrthoKCase, type SdField } from './types';
 
 export type Level = 'ok' | 'info' | 'caution' | 'stop';
@@ -70,16 +71,19 @@ export interface CaseScreening {
   overall: Level;
 }
 
-/** Stable key used to store the optometrist's response to a flag. */
-export function flagKey(flag: Pick<Flag, 'eye' | 'ruleId' | 'code'>): string {
-  return `${flag.eye ?? 'case'}:${flag.ruleId}:${flag.code}`;
+/**
+ * Stable key used to store the optometrist's response to a flag.
+ * Flags that can fire more than once for an eye (R17, once per measurement)
+ * add the field so each one gets its own response.
+ */
+export function flagKey(flag: Pick<Flag, 'eye' | 'ruleId' | 'code' | 'params'>): string {
+  const base = `${flag.eye ?? 'case'}:${flag.ruleId}:${flag.code}`;
+  return typeof flag.params.field === 'string' ? `${base}:${flag.params.field}` : base;
 }
 
-// Rounding to 0.01 before comparing avoids floating-point surprises like
-// 42.8 − 42.3 = 0.5000000000000071 tripping a "> 0.5" rule.
-const r2 = (x: number) => Math.round(x * 100) / 100;
-const fmt = (x: number, d = 2) => x.toFixed(d);
-const fmtSigned = (x: number, d = 2) => (x > 0 ? `+${x.toFixed(d)}` : x.toFixed(d));
+const r2 = round2;
+const fmt = formatFixed;
+const fmtSigned = formatSigned;
 
 /** Display order for flags with the same level: the order of the clinic notes. */
 const RULE_ORDER = ['N1', 'R3', 'R2', 'R1', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9', 'R10', 'R16', 'R17', 'N2', 'N3'];
@@ -212,7 +216,8 @@ export function screenEye(c: OrthoKCase, eye: Eye): EyeScreening {
     missing('R7', ['field.sphere']);
   } else {
     const params = { sphere: fmtSigned(basic.sphere), degrees: Math.round(Math.abs(basic.sphere) * 100), limit: fmt(rules.myopia.bestMaxMyopiaD) };
-    if (r2(basic.sphere) < rules.myopia.bestMaxMyopiaD) flag('R7', 'R7.beyond', 'caution', params, refractionNotes);
+    if (basic.sphere >= 0) flag('R7', 'R7.noMyopia', 'info', params, refractionNotes);
+    else if (r2(basic.sphere) < rules.myopia.bestMaxMyopiaD) flag('R7', 'R7.beyond', 'caution', params, refractionNotes);
     else flag('R7', 'R7.ok', 'ok', params, refractionNotes);
   }
 

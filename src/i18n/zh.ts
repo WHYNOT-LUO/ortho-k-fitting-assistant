@@ -536,6 +536,9 @@ export const zh = {
   'map.temporal': '颞侧',
   'map.nasal': '鼻侧',
   'app.offline': '离线版：无需联网，双击即可打开。数据只保存在这台电脑的这个浏览器里，建议用 Chrome 或 Edge 打开，并定期备份。',
+  'flag.R7.noMyopia': '球镜 {sphere} D，没有近视：角膜塑形镜用于矫正近视，请核对验光数据。',
+  'parent.flag.R7.noMyopia': '验光结果没有近视，验光师会核对数据。',
+  'cases.storageUnreadable': '之前保存的数据无法读取，已原样另存为 "{key}"，不会被覆盖。请先导出备份，并联系开发者恢复。',
 } as const;
 
 export type MessageKey = keyof typeof zh;

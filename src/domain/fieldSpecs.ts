@@ -270,9 +270,4 @@ export function formatNumber(value: number | null, decimals: number): string {
   return value.toFixed(decimals);
 }
 
-/** Signed format for refraction values: +1.25, −3.00. */
-export function formatSigned(value: number | null, decimals = 2): string {
-  if (value === null || !Number.isFinite(value)) return '';
-  const s = Math.abs(value).toFixed(decimals);
-  return value > 0 ? `+${s}` : value < 0 ? `−${s}` : s;
-}
+export { formatSigned } from './format';

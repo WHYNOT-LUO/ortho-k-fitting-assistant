@@ -11,11 +11,11 @@
  * Thresholds come from config/clinicRules.ts.
  */
 import { clinicRules } from '../config/clinicRules';
+import { formatSigned, round2 } from './format';
 import type { Flag, Level } from './screening';
 import type { Adjustment, Eye, Fluorescein, OrthoKCase, TrialLens, Visit } from './types';
 
-const r2 = (x: number) => Math.round(x * 100) / 100;
-const fmtSigned = (x: number) => (x > 0 ? `+${x.toFixed(2)}` : x.toFixed(2));
+const r2 = round2;
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** A "6-month" visit is often booked a few days early; allow about a week. */
 const GAP_TOLERANCE_MONTHS = 0.25;
@@ -156,7 +156,7 @@ export function visitFlags(_c: OrthoKCase, visit: Visit, eye: Eye): Flag[] {
 
   if (v.overRefraction !== null) {
     const over = r2(v.overRefraction);
-    const params = { over: fmtSigned(over) };
+    const params = { over: formatSigned(over) };
     if (over <= rules.underCorrection.atOrBelowD) flags.push(makeFlag('R13', 'R13.under', 'caution', eye, params));
     else if (over >= rules.overCorrection.atOrAboveD) flags.push(makeFlag('R14', 'R14.over', 'caution', eye, params));
     else flags.push(makeFlag('R13', 'OR.ok', 'ok', eye, params));

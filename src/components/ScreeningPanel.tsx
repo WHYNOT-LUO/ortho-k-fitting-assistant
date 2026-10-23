@@ -1,4 +1,4 @@
-import { screenCase } from '../domain/screening';
+import { flagKey, screenCase } from '../domain/screening';
 import type { FlagResponse, OrthoKCase } from '../domain/types';
 import { useLang } from '../i18n';
 import { notCheckedText } from '../i18n/flags';
@@ -26,7 +26,7 @@ export function ScreeningPanel({ c }: { c: OrthoKCase }) {
         <section className="card">
           <h3>{t('screen.caseLevel')}</h3>
           {result.caseFlags.map((f) => (
-            <FlagItem key={f.code} flag={f} response={c.flagResponses[`case:${f.ruleId}:${f.code}`]} onRespond={respond} />
+            <FlagItem key={flagKey(f)} flag={f} response={c.flagResponses[flagKey(f)]} onRespond={respond} />
           ))}
         </section>
       )}
@@ -51,9 +51,9 @@ export function ScreeningPanel({ c }: { c: OrthoKCase }) {
               ) : (
                 raised.map((f) => (
                   <FlagItem
-                    key={f.code}
+                    key={flagKey(f)}
                     flag={f}
-                    response={c.flagResponses[`${r.eye}:${f.ruleId}:${f.code}`]}
+                    response={c.flagResponses[flagKey(f)]}
                     onRespond={respond}
                   />
                 ))
@@ -80,7 +80,7 @@ export function ScreeningPanel({ c }: { c: OrthoKCase }) {
                     {t('screen.passed', { n: passed.length })}
                   </summary>
                   {passed.map((f) => (
-                    <FlagItem key={f.code} flag={f} />
+                    <FlagItem key={flagKey(f)} flag={f} />
                   ))}
                 </details>
               )}

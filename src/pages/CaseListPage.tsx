@@ -14,7 +14,7 @@ const stamp = () => new Date().toISOString().slice(0, 10);
 
 export function CaseListPage() {
   const { t } = useLang();
-  const { cases, replaceAll, error } = useCases();
+  const { cases, replaceAll, error, recoveredKey } = useCases();
   const [message, setMessage] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -105,6 +105,7 @@ export function CaseListPage() {
       <p className="small muted" style={{ marginTop: -8 }}>
         {t('export.note')}
       </p>
+      {recoveredKey && <div className="notice level-stop">{t('cases.storageUnreadable', { key: recoveredKey })}</div>}
       {error && <div className="notice level-stop">{t('cases.storageError', { error })}</div>}
       {message && <div className="notice level-info">{message}</div>}
 

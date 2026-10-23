@@ -65,17 +65,17 @@ export function caseOutcome(c: OrthoKCase): CaseOutcome {
       }
       if (e.fitSuccessful && successVisit === null) successVisit = i + 1;
     });
-    // Reorders after the fit was already successful (e.g. a lost lens) don't
-    // change whether the first fit was right.
-    const fitReordersBeforeSuccess = visits
-      .slice(0, successVisit ?? visits.length)
-      .filter((v) => v.eyes[eye].reorderPlaced && FIT_RELATED.includes(v.eyes[eye].reorderReason)).length;
+    // Trial lenses and reorders after the fit was already successful (e.g. a
+    // refit after a lost lens) don't change whether the first fit was right.
+    const upToSuccess = visits.slice(0, successVisit ?? visits.length);
+    const trialsBeforeSuccess = upToSuccess.reduce((n, v) => n + v.eyes[eye].trials.length, 0);
+    const fitReordersBeforeSuccess = upToSuccess.filter((v) => v.eyes[eye].reorderPlaced && FIT_RELATED.includes(v.eyes[eye].reorderReason)).length;
     eyes[eye] = {
       trialLenses,
       reorders,
       fitReorders,
       successVisit,
-      rightFirstTime: successVisit === null ? null : trialLenses <= 1 && fitReordersBeforeSuccess === 0,
+      rightFirstTime: successVisit === null ? null : trialsBeforeSuccess <= 1 && fitReordersBeforeSuccess === 0,
     };
   }
 

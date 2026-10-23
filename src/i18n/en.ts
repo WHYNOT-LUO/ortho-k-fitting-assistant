@@ -539,4 +539,7 @@ export const en: Record<MessageKey, string> = {
   'map.temporal': 'temporal',
   'map.nasal': 'nasal',
   'app.offline': 'Offline version: works without internet. Data is saved only in this browser on this computer; use Chrome or Edge, and back up regularly.',
+  'flag.R7.noMyopia': 'Sphere {sphere} D shows no myopia: ortho-k corrects myopia, so please check the refraction.',
+  'parent.flag.R7.noMyopia': 'The refraction shows no myopia; the optometrist will check the numbers.',
+  'cases.storageUnreadable': "Previously saved data could not be read. It has been kept unchanged under \"{key}\" so it won't be overwritten. Export a backup and ask the developer to recover it.",
 };

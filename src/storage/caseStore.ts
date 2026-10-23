@@ -75,6 +75,13 @@ export function normalizeCase(raw: unknown): OrthoKCase | null {
   }
   c.flagResponses = isObject(raw.flagResponses) ? (raw.flagResponses as OrthoKCase['flagResponses']) : {};
   c.visits = Array.isArray(raw.visits) ? raw.visits.map(normalizeVisit) : [];
+  // Visits are edited and deleted by id, so ids must exist and be unique.
+  const seen = new Set<string>();
+  c.visits.forEach((v, i) => {
+    if (!v.id || seen.has(v.id)) v.id = `${c.id}-visit-${i + 1}`;
+    while (seen.has(v.id)) v.id += '-dup';
+    seen.add(v.id);
+  });
   return c;
 }
 
@@ -85,13 +92,35 @@ export function parseCases(json: string): OrthoKCase[] {
   return list.map(normalizeCase).filter((c): c is OrthoKCase => c !== null);
 }
 
-export function loadCases(): OrthoKCase[] {
+type KeyValueStore = Pick<Storage, 'getItem' | 'setItem'>;
+
+/**
+ * Load saved cases. If the saved text can't be read (e.g. a write was cut
+ * short), it is copied to a separate key first, so the next save can't wipe
+ * it and it can still be recovered by hand.
+ */
+export function loadCasesWithStatus(store: KeyValueStore = localStorage): {
+  cases: OrthoKCase[];
+  recoveredKey: string | null;
+} {
+  let json: string | null = null;
   try {
-    const json = localStorage.getItem(CASES_STORAGE_KEY);
-    return json ? parseCases(json) : [];
+    json = store.getItem(CASES_STORAGE_KEY);
+    return { cases: json ? parseCases(json) : [], recoveredKey: null };
   } catch {
-    return [];
+    if (!json) return { cases: [], recoveredKey: null };
+    const recoveredKey = `${CASES_STORAGE_KEY}.unreadable-${new Date().toISOString()}`;
+    try {
+      store.setItem(recoveredKey, json);
+    } catch {
+      // storage full or blocked: nothing more we can do here
+    }
+    return { cases: [], recoveredKey };
   }
+}
+
+export function loadCases(): OrthoKCase[] {
+  return loadCasesWithStatus().cases;
 }
 
 /** Returns an error message if saving failed (e.g. storage full or blocked). */

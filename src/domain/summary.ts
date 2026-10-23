@@ -14,12 +14,12 @@ import { flagText, notCheckedText } from '../i18n/flags';
 import { translate, type Lang } from '../i18n';
 import type { MessageKey } from '../i18n/zh';
 import { suggestDesign } from './design';
+import { formatSigned } from './format';
 import { axialGrowth, sortVisits, visitFlags } from './followup';
 import { caseOutcome } from './metrics';
 import { screenCase, type Flag } from './screening';
 import { EYES, type Eye, type OrthoKCase } from './types';
 
-const fmtSigned = (x: number) => (x > 0 ? `+${x.toFixed(2)}` : x < 0 ? `−${Math.abs(x).toFixed(2)}` : x.toFixed(2));
 
 function fittedEyes(c: OrthoKCase): Eye[] {
   return EYES.filter((e) => c.eyesFitted[e]);
@@ -113,10 +113,13 @@ export function parentSummary(c: OrthoKCase, lang: Lang): string {
   const screening = screenCase(c);
   const lines: string[] = [t('parent.title', { id: c.id }), t('parent.intro')];
 
+  // Most rules have one plain-language line; a few codes need their own.
   const parentLine = (f: Flag) => {
-    const key = `parent.flag.${f.ruleId}` as MessageKey;
-    const text = translate(lang, key);
-    return text === key ? t('parent.flag.generic') : text;
+    for (const key of [`parent.flag.${f.code}`, `parent.flag.${f.ruleId}`] as MessageKey[]) {
+      const text = translate(lang, key);
+      if (text !== key) return text;
+    }
+    return t('parent.flag.generic');
   };
 
   for (const r of screening.eyes) {
@@ -126,7 +129,7 @@ export function parentSummary(c: OrthoKCase, lang: Lang): string {
     lines.push(t(`eye.${eye}`));
 
     if (basic.sphere !== null && basic.sphere < 0) {
-      lines.push(`• ${t('parent.myopia', { degrees: Math.round(Math.abs(basic.sphere) * 100), sphere: fmtSigned(basic.sphere) })}`);
+      lines.push(`• ${t('parent.myopia', { degrees: Math.round(Math.abs(basic.sphere) * 100), sphere: formatSigned(basic.sphere) })}`);
     }
     if (basic.cylinder !== null && basic.cylinder !== 0) {
       lines.push(`• ${t('parent.astig', { degrees: Math.round(Math.abs(basic.cylinder) * 100) })}`);

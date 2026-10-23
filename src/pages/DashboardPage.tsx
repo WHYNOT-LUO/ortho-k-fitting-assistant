@@ -13,7 +13,11 @@ const COST_KEY = 'orthok.dashboard.costs';
 function loadCosts(): { reorder: number | null; trial: number | null } {
   try {
     const raw = localStorage.getItem(COST_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const saved = JSON.parse(raw) as Record<string, unknown>;
+      const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+      return { reorder: num(saved?.reorder), trial: num(saved?.trial) };
+    }
   } catch {
     // ignore: costs are a convenience only
   }

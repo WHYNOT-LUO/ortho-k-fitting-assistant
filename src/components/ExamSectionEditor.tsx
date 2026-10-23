@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import {
   formatNumber,
   formatSigned,
@@ -44,6 +44,23 @@ function MeasuredRow({
   const value = values[spec.key] as number | null;
   const sd = values[spec.sdKey] as number | null;
 
+  // Follow changes made elsewhere (e.g. "copy right eye to left eye").
+  useEffect(() => {
+    if (parseReadings(text).join(',') !== (readings ?? []).join(',')) setText(readings?.join(', ') ?? '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [readings]);
+
+  /** Typing AVG or SD by hand means the old raw readings no longer match: drop them. */
+  const setByHand = (key: string, v: number | null) => {
+    onSet(key, v);
+    if (readings?.length) {
+      const nextReadings = { ...((values.readings as Record<string, number[]>) ?? {}) };
+      delete nextReadings[spec.key];
+      onSet('readings', nextReadings);
+      setApplied(null);
+    }
+  };
+
   const applyReadings = (raw: string) => {
     setText(raw);
     const list = parseReadings(raw);
@@ -75,7 +92,7 @@ function MeasuredRow({
           step={spec.step}
           range={spec.range}
           disabled={disabled}
-          onChange={(v) => onSet(spec.key, v)}
+          onChange={(v) => setByHand(spec.key, v)}
         />
         <NumberInput
           ariaLabel={`${t(spec.label)} SD`}
@@ -83,7 +100,7 @@ function MeasuredRow({
           unit="SD"
           step={spec.step}
           disabled={disabled}
-          onChange={(v) => onSet(spec.sdKey, v)}
+          onChange={(v) => setByHand(spec.sdKey, v)}
         />
         <input
           type="text"
