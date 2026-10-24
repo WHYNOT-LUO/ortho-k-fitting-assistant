@@ -3,6 +3,7 @@
 [![Deploy to GitHub Pages](https://github.com/WHYNOT-LUO/ortho-k-fitting-assistant/actions/workflows/deploy.yml/badge.svg)](https://github.com/WHYNOT-LUO/ortho-k-fitting-assistant/actions/workflows/deploy.yml)
 ![状态：研究原型](https://img.shields.io/badge/%E7%8A%B6%E6%80%81-%E7%A0%94%E7%A9%B6%E5%8E%9F%E5%9E%8B-orange)
 ![界面：中文 | English](https://img.shields.io/badge/UI-%E4%B8%AD%E6%96%87%20%7C%20English-blue)
+[![许可证：MIT](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
 [English](README.md) · **简体中文**
 
@@ -395,4 +396,4 @@ npm run build:offline  # 生成单个离线 HTML 文件（offline/）
 这是 [@WHYNOT-LUO](https://github.com/WHYNOT-LUO) 的高中独立研究项目。验配流程来自我在一家诊所的实地学习，
 规则和测试病例来自我的诊所笔记。应用在 AI 编程工具（Claude Code）的辅助下开发。
 
-目前尚未选择开源许可证，作者保留所有权利。
+本项目以 [MIT 许可证](LICENSE) 开源。许可证只涉及代码，并不表示本应用可用于临床（见页首的警告）。

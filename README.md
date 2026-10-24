@@ -4,6 +4,7 @@
 ![Status: research prototype](https://img.shields.io/badge/status-research%20prototype-orange)
 ![Languages: 中文 | English](https://img.shields.io/badge/UI-%E4%B8%AD%E6%96%87%20%7C%20English-blue)
 ![No backend](https://img.shields.io/badge/data-stays%20in%20the%20browser-green)
+[![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
 **English** · [简体中文](README.zh-CN.md)
 
@@ -428,5 +429,5 @@ come from hands-on time at a local clinic, and the rules and test cases are
 taken from my clinic notes. The app was built with AI coding assistance
 (Claude Code).
 
-No open-source license has been chosen yet, so all rights are reserved by the
-author.
+Released under the [MIT License](LICENSE). The license covers the code; it
+does not make the app suitable for clinical use (see the warning at the top).
