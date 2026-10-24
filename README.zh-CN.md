@@ -54,14 +54,20 @@
 ## 与诊所流程的对应
 
 ```mermaid
-flowchart LR
-    H["1 病史"] --> B["2 基础检查"] --> M["3 生物测量仪"] --> T["4 角膜地形图"]
-    T --> S{"适配筛查<br/>R1-R17"}
-    S --> D["设计建议<br/>D1-D7"]
-    D --> O["验光师<br/>接受 / 拒绝"]
-    O --> L["试戴与订片"]
-    L --> F["复诊随访<br/>R11-R15"]
-    F --> DATA[("结构化<br/>病例数据")]
+flowchart TB
+    subgraph EXAM["录入病例"]
+        direction LR
+        H["1 病史"] --> B["2 基础检查"] --> M["3 生物测量仪"] --> T["4 角膜地形图"]
+    end
+    subgraph DECIDE["判断"]
+        direction LR
+        S{"适配筛查<br/>R1-R17"} --> D["设计建议<br/>D1-D7"] --> O["验光师<br/>接受 / 拒绝"]
+    end
+    subgraph FIT["验配与随访"]
+        direction LR
+        L["试戴与订片"] --> F["复诊随访<br/>R11-R15"] --> DATA[("结构化<br/>病例数据")]
+    end
+    EXAM --> DECIDE --> FIT
     DATA --> DASH["数据看板"]
     DATA --> CSV["CSV 导出<br/>用于将来的模型"]
 ```

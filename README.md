@@ -65,14 +65,20 @@ consistent and measurable**.
 ## How it fits the clinic workflow
 
 ```mermaid
-flowchart LR
-    H["1 History"] --> B["2 Basic tests"] --> M["3 Biometer"] --> T["4 Topography"]
-    T --> S{"Screening<br/>R1-R17"}
-    S --> D["Design suggestion<br/>D1-D7"]
-    D --> O["Optometrist<br/>accepts / rejects"]
-    O --> L["Trial lenses<br/>and order"]
-    L --> F["Follow-up<br/>R11-R15"]
-    F --> DATA[("Structured<br/>case data")]
+flowchart TB
+    subgraph EXAM["Case entry"]
+        direction LR
+        H["1 History"] --> B["2 Basic tests"] --> M["3 Biometer"] --> T["4 Topography"]
+    end
+    subgraph DECIDE["Decide"]
+        direction LR
+        S{"Screening<br/>R1-R17"} --> D["Design suggestion<br/>D1-D7"] --> O["Optometrist<br/>accepts / rejects"]
+    end
+    subgraph FIT["Fit and follow up"]
+        direction LR
+        L["Trial lenses<br/>and order"] --> F["Follow-up<br/>R11-R15"] --> DATA[("Structured<br/>case data")]
+    end
+    EXAM --> DECIDE --> FIT
     DATA --> DASH["Dashboard"]
     DATA --> CSV["CSV export<br/>for a future model"]
 ```
